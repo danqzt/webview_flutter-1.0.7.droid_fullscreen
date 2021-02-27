@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -51,6 +50,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     private boolean isFullscreen = false;
     private WebChromeClient.CustomViewCallback customViewCallback;
     private View customView;
+    private int currentUiSettings;
+
 
     @Override
     public boolean onCreateWindow(
@@ -102,7 +103,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       Activity activity = WebViewFlutterPlugin.activityRef.get();
       if (activity != null) {
         ((FrameLayout)activity.getWindow().getDecorView()).addView(view);
-        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+        View currentView = activity.getWindow().getDecorView();
+        this.currentUiSettings = currentView.getSystemUiVisibility();
+        currentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
       }
@@ -120,8 +123,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       if (activity != null) {
         ((FrameLayout) activity.getWindow().getDecorView()).removeView(this.customView);
         this.customView = null;
-        activity.getWindow().getDecorView().setSystemUiVisibility(0);
+        activity.getWindow().getDecorView().setSystemUiVisibility(this.currentUiSettings);
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         customViewCallback.onCustomViewHidden();
       }
       isFullscreen = false;

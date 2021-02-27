@@ -37,8 +37,8 @@ android {
     }
 }
 
-/* for local development in Android studio
+/*// for local development in Android studio
 dependencies {
     compileOnly files('tmplib/flutter.jar')
-}
-*/
+}*/
+
